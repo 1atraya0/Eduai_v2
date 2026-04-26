@@ -32,14 +32,7 @@ const homePackagesCarouselMarkup = `
         <h2 class="mt-2 text-3xl font-bold leading-tight text-gray-900 sm:text-4xl">Popular Packages</h2>
         <p class="mt-2 text-sm text-gray-600">Swipe or use arrows to explore and book instantly.</p>
       </div>
-      <div class="flex items-center gap-2">
-        <button id="homePackagesPrev" type="button" class="home-carousel-nav" aria-label="Previous packages">
-          <i class="fa-solid fa-arrow-left"></i>
-        </button>
-        <button id="homePackagesNext" type="button" class="home-carousel-nav" aria-label="Next packages">
-          <i class="fa-solid fa-arrow-right"></i>
-        </button>
-      </div>
+      <div></div>
     </div>
 
     <div class="home-packages-viewport">
@@ -314,24 +307,6 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
     .home-packages-viewport {
       position: relative;
       border-radius: 1rem;
-    }
-    .home-packages-viewport::before,
-    .home-packages-viewport::after {
-      content: "";
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      width: 3rem;
-      z-index: 3;
-      pointer-events: none;
-    }
-    .home-packages-viewport::before {
-      left: 0;
-      background: linear-gradient(90deg, #f9fafb 0%, rgba(249, 250, 251, 0) 100%);
-    }
-    .home-packages-viewport::after {
-      right: 0;
-      background: linear-gradient(270deg, #f9fafb 0%, rgba(249, 250, 251, 0) 100%);
     }
     .home-package-card {
       scroll-snap-align: start;
@@ -1045,8 +1020,6 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
 
     function wireHomePackagesCarousel() {
       const track = document.getElementById("homePackagesTrack");
-      const prev = document.getElementById("homePackagesPrev");
-      const next = document.getElementById("homePackagesNext");
       const dotsHost = document.getElementById("homePackagesDots");
       if (!(track instanceof HTMLElement)) return;
 
@@ -1131,9 +1104,6 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
           scrollToIndex(activeIndex + 1, "smooth");
         }, 3200);
       };
-
-      prev?.addEventListener("click", () => scrollByCard(-1));
-      next?.addEventListener("click", () => scrollByCard(1));
 
       dotsHost?.addEventListener("click", (event) => {
         const target = event.target;
