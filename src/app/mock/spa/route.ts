@@ -19,12 +19,142 @@ type TabId = keyof typeof resourceFiles;
 const navItems: Array<{ id: TabId; label: string }> = [
   { id: "home", label: "Home" },
   { id: "flights", label: "Flights" },
-  { id: "hotels", label: "Hotels" },
   { id: "packages", label: "Packages" },
-  { id: "dashboard", label: "Dashboard" },
   { id: "about", label: "About Us" },
   { id: "terms", label: "T&C" },
 ];
+
+const homePackagesCarouselMarkup = `
+  <section class="home-packages-shell mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-8" aria-label="Featured travel packages">
+    <div class="mb-5 flex items-end justify-between gap-3">
+      <div>
+        <p class="text-xs font-semibold uppercase tracking-[0.2em] text-brand-700">Handpicked Escapes</p>
+        <h2 class="mt-2 text-3xl font-bold leading-tight text-gray-900 sm:text-4xl">Popular Packages</h2>
+        <p class="mt-2 text-sm text-gray-600">Swipe or use arrows to explore and book instantly.</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button id="homePackagesPrev" type="button" class="home-carousel-nav" aria-label="Previous packages">
+          <i class="fa-solid fa-arrow-left"></i>
+        </button>
+        <button id="homePackagesNext" type="button" class="home-carousel-nav" aria-label="Next packages">
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+
+    <div class="home-packages-viewport">
+      <div id="homePackagesTrack" class="home-packages-track" aria-live="polite">
+        <article class="home-package-card" data-carousel-index="0">
+          <img class="home-package-image" src="https://images.unsplash.com/photo-1598091383021-15ddea10925d?auto=format&fit=crop&w=900&q=80" alt="Snowy Kashmir valley" loading="lazy" />
+          <div class="home-package-content">
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-brand-700">4N / 5D</p>
+            <h3 class="mt-2 text-xl font-bold text-gray-900">Kashmir Snowline</h3>
+            <p class="mt-2 text-sm text-gray-600">Srinagar, Gulmarg, and Pahalgam with flights and boutique stays.</p>
+            <div class="mt-4 flex items-center justify-between gap-2">
+              <p class="text-brand-600 text-lg font-bold">Rs 34,900</p>
+              <div class="flex items-center gap-2">
+                <button type="button" class="rounded-lg border border-brand-200 bg-white px-3 py-2 text-xs font-semibold text-brand-700 hover:bg-brand-50" data-tab-target="packages">View</button>
+                <button type="button" class="rounded-lg bg-brand-600 px-3 py-2 text-xs font-semibold text-white hover:bg-brand-700" data-open-booking="true" data-booking-type="package">Add</button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="home-package-card" data-carousel-index="1">
+          <img class="home-package-image" src="https://images.unsplash.com/photo-1602216056096-3b40cc0c9944?auto=format&fit=crop&w=900&q=80" alt="Kerala backwaters and greenery" loading="lazy" />
+          <div class="home-package-content">
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-brand-700">3N / 4D</p>
+            <h3 class="mt-2 text-xl font-bold text-gray-900">Kerala Escape</h3>
+            <p class="mt-2 text-sm text-gray-600">Munnar and Alleppey with private transfers and curated experiences.</p>
+            <div class="mt-4 flex items-center justify-between gap-2">
+              <p class="text-brand-600 text-lg font-bold">Rs 28,999</p>
+              <div class="flex items-center gap-2">
+                <button type="button" class="rounded-lg border border-brand-200 bg-white px-3 py-2 text-xs font-semibold text-brand-700 hover:bg-brand-50" data-tab-target="packages">View</button>
+                <button type="button" class="rounded-lg bg-brand-600 px-3 py-2 text-xs font-semibold text-white hover:bg-brand-700" data-open-booking="true" data-booking-type="package">Add</button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="home-package-card" data-carousel-index="2">
+          <img class="home-package-image" src="https://images.unsplash.com/photo-1589308078059-be1415eab4c3?auto=format&fit=crop&w=900&q=80" alt="Andaman beach and turquoise water" loading="lazy" />
+          <div class="home-package-content">
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-brand-700">5N / 6D</p>
+            <h3 class="mt-2 text-xl font-bold text-gray-900">Andaman Blue</h3>
+            <p class="mt-2 text-sm text-gray-600">Island hopping, beach stays, and water activities with local guides.</p>
+            <div class="mt-4 flex items-center justify-between gap-2">
+              <p class="text-brand-600 text-lg font-bold">Rs 39,500</p>
+              <div class="flex items-center gap-2">
+                <button type="button" class="rounded-lg border border-brand-200 bg-white px-3 py-2 text-xs font-semibold text-brand-700 hover:bg-brand-50" data-tab-target="packages">View</button>
+                <button type="button" class="rounded-lg bg-brand-600 px-3 py-2 text-xs font-semibold text-white hover:bg-brand-700" data-open-booking="true" data-booking-type="package">Add</button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="home-package-card" data-carousel-index="3">
+          <img class="home-package-image" src="https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=900&q=80" alt="North East hills and clouds" loading="lazy" />
+          <div class="home-package-content">
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-brand-700">6N / 7D</p>
+            <h3 class="mt-2 text-xl font-bold text-gray-900">North East Explorer</h3>
+            <p class="mt-2 text-sm text-gray-600">Shillong, Cherrapunji, and Kaziranga with scenic road journeys.</p>
+            <div class="mt-4 flex items-center justify-between gap-2">
+              <p class="text-brand-600 text-lg font-bold">Rs 42,400</p>
+              <div class="flex items-center gap-2">
+                <button type="button" class="rounded-lg border border-brand-200 bg-white px-3 py-2 text-xs font-semibold text-brand-700 hover:bg-brand-50" data-tab-target="packages">View</button>
+                <button type="button" class="rounded-lg bg-brand-600 px-3 py-2 text-xs font-semibold text-white hover:bg-brand-700" data-open-booking="true" data-booking-type="package">Add</button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="home-package-card" data-carousel-index="4">
+          <img class="home-package-image" src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=900&q=80" alt="Goa beach at sunset" loading="lazy" />
+          <div class="home-package-content">
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-brand-700">3N / 4D</p>
+            <h3 class="mt-2 text-xl font-bold text-gray-900">Goa Weekend Escape</h3>
+            <p class="mt-2 text-sm text-gray-600">Beachfront stay, nightlife experiences, and private airport transfer.</p>
+            <div class="mt-4 flex items-center justify-between gap-2">
+              <p class="text-brand-600 text-lg font-bold">Rs 24,500</p>
+              <div class="flex items-center gap-2">
+                <button type="button" class="rounded-lg border border-brand-200 bg-white px-3 py-2 text-xs font-semibold text-brand-700 hover:bg-brand-50" data-tab-target="packages">View</button>
+                <button type="button" class="rounded-lg bg-brand-600 px-3 py-2 text-xs font-semibold text-white hover:bg-brand-700" data-open-booking="true" data-booking-type="package">Add</button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <article class="home-package-card" data-carousel-index="5">
+          <img class="home-package-image" src="https://images.unsplash.com/photo-1590845947670-c009801ffa74?auto=format&fit=crop&w=900&q=80" alt="Golden Temple in Amritsar" loading="lazy" />
+          <div class="home-package-content">
+            <p class="text-xs font-semibold uppercase tracking-[0.18em] text-brand-700">2N / 3D</p>
+            <h3 class="mt-2 text-xl font-bold text-gray-900">Punjab Heritage Trail</h3>
+            <p class="mt-2 text-sm text-gray-600">Amritsar highlights, local food walks, and guided city experiences.</p>
+            <div class="mt-4 flex items-center justify-between gap-2">
+              <p class="text-brand-600 text-lg font-bold">Rs 21,700</p>
+              <div class="flex items-center gap-2">
+                <button type="button" class="rounded-lg border border-brand-200 bg-white px-3 py-2 text-xs font-semibold text-brand-700 hover:bg-brand-50" data-tab-target="packages">View</button>
+                <button type="button" class="rounded-lg bg-brand-600 px-3 py-2 text-xs font-semibold text-white hover:bg-brand-700" data-open-booking="true" data-booking-type="package">Add</button>
+              </div>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+    <div id="homePackagesDots" class="mt-4 flex items-center justify-center gap-2" aria-hidden="true"></div>
+  </section>
+`;
+
+function injectHomePackagesCarousel(markup: string): string {
+  if (markup.includes("id=\"homePackagesTrack\"")) {
+    return markup;
+  }
+  const whyChooseHeadingPattern = /(<h2[^>]*>\s*Why\s+Choose\s+EduaiTrips\s*<\/h2>)/i;
+  if (whyChooseHeadingPattern.test(markup)) {
+    return markup.replace(whyChooseHeadingPattern, `${homePackagesCarouselMarkup}\n$1`);
+  }
+  return `${markup}\n${homePackagesCarouselMarkup}`;
+}
 
 function extractBody(html: string): string {
   const match = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
@@ -76,7 +206,7 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
     )
     .join("\n");
 
-  const tabPanels: TabId[] = ["home", "flights", "hotels", "packages", "dashboard", "about", "terms", "login"];
+  const tabPanels: TabId[] = ["home", "flights", "hotels", "packages", "payment", "dashboard", "about", "terms", "login"];
 
   const sections = tabPanels
     .map(
@@ -161,6 +291,95 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
       opacity: 0;
       transform: translateY(-10px);
       pointer-events: none;
+    }
+    .home-packages-shell {
+      position: relative;
+      z-index: 2;
+    }
+    .home-packages-track {
+      display: grid;
+      grid-auto-flow: column;
+      grid-auto-columns: minmax(300px, 1fr);
+      gap: 1rem;
+      overflow-x: auto;
+      scroll-behavior: smooth;
+      padding-bottom: 0.4rem;
+      scroll-snap-type: x mandatory;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .home-packages-track::-webkit-scrollbar {
+      display: none;
+    }
+    .home-packages-viewport {
+      position: relative;
+      border-radius: 1rem;
+    }
+    .home-packages-viewport::before,
+    .home-packages-viewport::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 3rem;
+      z-index: 3;
+      pointer-events: none;
+    }
+    .home-packages-viewport::before {
+      left: 0;
+      background: linear-gradient(90deg, #f9fafb 0%, rgba(249, 250, 251, 0) 100%);
+    }
+    .home-packages-viewport::after {
+      right: 0;
+      background: linear-gradient(270deg, #f9fafb 0%, rgba(249, 250, 251, 0) 100%);
+    }
+    .home-package-card {
+      scroll-snap-align: start;
+      border: 1px solid #e5e7eb;
+      border-radius: 1rem;
+      background: linear-gradient(180deg, #ffffff 0%, #f7fbf7 100%);
+      min-height: 310px;
+      overflow: hidden;
+      box-shadow: 0 16px 44px -28px rgba(20, 83, 45, 0.45);
+      transition: transform 180ms ease, box-shadow 180ms ease;
+    }
+    .home-package-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 22px 52px -30px rgba(20, 83, 45, 0.55);
+    }
+    .home-package-image {
+      width: 100%;
+      height: 170px;
+      object-fit: cover;
+      display: block;
+    }
+    .home-package-content {
+      padding: 0.95rem;
+    }
+    .home-carousel-nav {
+      width: 2.35rem;
+      height: 2.35rem;
+      border-radius: 0.75rem;
+      border: 1px solid #d1d5db;
+      color: #374151;
+      background: #fff;
+      transition: all 180ms ease;
+    }
+    .home-carousel-nav:hover {
+      border-color: #22c55e;
+      color: #15803d;
+      background: #f0fdf4;
+    }
+    .home-carousel-dot {
+      width: 0.55rem;
+      height: 0.55rem;
+      border-radius: 999px;
+      background: #d1d5db;
+      transition: all 180ms ease;
+    }
+    .home-carousel-dot.active {
+      width: 1.2rem;
+      background: #16a34a;
     }
     .spa-card {
       width: min(560px, 96vw);
@@ -424,6 +643,12 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
       [data-tab-panel="login"] select {
         min-height: 2.8rem;
       }
+      .home-packages-track {
+        grid-auto-columns: minmax(84%, 1fr);
+      }
+      .home-package-image {
+        height: 160px;
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -523,7 +748,7 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
       "signup": "login"
     };
 
-    const tabOrder = ["home", "flights", "hotels", "packages", "dashboard", "about", "terms", "login"];
+    const tabOrder = ["home", "flights", "hotels", "packages", "payment", "dashboard", "about", "terms", "login"];
     let currentTab = "home";
     const cartItems = [];
     let lastScrollY = window.scrollY;
@@ -818,6 +1043,125 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
       });
     }
 
+    function wireHomePackagesCarousel() {
+      const track = document.getElementById("homePackagesTrack");
+      const prev = document.getElementById("homePackagesPrev");
+      const next = document.getElementById("homePackagesNext");
+      const dotsHost = document.getElementById("homePackagesDots");
+      if (!(track instanceof HTMLElement)) return;
+
+      const cards = Array.from(track.querySelectorAll(".home-package-card"));
+      if (cards.length === 0) return;
+
+      let activeIndex = 0;
+      let autoTimer;
+      const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      if (dotsHost) {
+        dotsHost.innerHTML = cards
+          .map((_, index) => {
+            const activeClass = index === 0 ? " active" : "";
+            return '<button type="button" class="home-carousel-dot' + activeClass + '" data-carousel-dot="' + index + '" aria-label="Go to package ' + (index + 1) + '"></button>';
+          })
+          .join("");
+      }
+
+      const setActiveDot = (index) => {
+        dotsHost?.querySelectorAll(".home-carousel-dot").forEach((dot, dotIndex) => {
+          dot.classList.toggle("active", dotIndex === index);
+        });
+      };
+
+      const scrollToIndex = (index, behavior = "smooth") => {
+        const normalized = ((index % cards.length) + cards.length) % cards.length;
+        const wrappedForward = index >= cards.length;
+        const wrappedBackward = index < 0;
+
+        if (wrappedForward || wrappedBackward) {
+          const jumpCard = cards[normalized];
+          if (!(jumpCard instanceof HTMLElement)) return;
+          activeIndex = normalized;
+          track.scrollTo({ left: jumpCard.offsetLeft, behavior: "auto" });
+          setActiveDot(activeIndex);
+          return;
+        }
+
+        const bounded = ((index % cards.length) + cards.length) % cards.length;
+        const nextCard = cards[bounded];
+        if (!(nextCard instanceof HTMLElement)) return;
+        activeIndex = bounded;
+        track.scrollTo({ left: nextCard.offsetLeft, behavior });
+        setActiveDot(activeIndex);
+      };
+
+      const scrollByCard = (direction) => {
+        scrollToIndex(activeIndex + direction, "smooth");
+      };
+
+      const updateActiveFromScroll = () => {
+        const center = track.scrollLeft + track.clientWidth / 2;
+        let bestIndex = 0;
+        let bestDistance = Number.POSITIVE_INFINITY;
+        cards.forEach((card, index) => {
+          if (!(card instanceof HTMLElement)) return;
+          const cardCenter = card.offsetLeft + card.clientWidth / 2;
+          const distance = Math.abs(center - cardCenter);
+          if (distance < bestDistance) {
+            bestDistance = distance;
+            bestIndex = index;
+          }
+        });
+        if (bestIndex !== activeIndex) {
+          activeIndex = bestIndex;
+          setActiveDot(activeIndex);
+        }
+      };
+
+      const stopAuto = () => {
+        if (autoTimer) {
+          window.clearInterval(autoTimer);
+          autoTimer = undefined;
+        }
+      };
+
+      const startAuto = () => {
+        if (reducedMotion) return;
+        stopAuto();
+        autoTimer = window.setInterval(() => {
+          scrollToIndex(activeIndex + 1, "smooth");
+        }, 3200);
+      };
+
+      prev?.addEventListener("click", () => scrollByCard(-1));
+      next?.addEventListener("click", () => scrollByCard(1));
+
+      dotsHost?.addEventListener("click", (event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement)) return;
+        const dot = target.closest("[data-carousel-dot]");
+        if (!(dot instanceof HTMLElement)) return;
+        const index = Number(dot.getAttribute("data-carousel-dot"));
+        if (!Number.isFinite(index)) return;
+        scrollToIndex(index, "smooth");
+      });
+
+      track.addEventListener("scroll", updateActiveFromScroll, { passive: true });
+      track.addEventListener("pointerenter", stopAuto);
+      track.addEventListener("pointerleave", startAuto);
+      track.addEventListener("focusin", stopAuto);
+      track.addEventListener("focusout", startAuto);
+
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden) {
+          stopAuto();
+        } else {
+          startAuto();
+        }
+      });
+
+      startAuto();
+    }
+
     function getMappedTabFromText(text) {
       const key = (text || "").toLowerCase().trim();
       if (!key) return null;
@@ -829,7 +1173,7 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
       const t = (text || "").toLowerCase().trim();
       if (!t) return null;
 
-      if (t.includes("explore packages") || t.includes("view packages") || t.includes("view details") || t.includes("load more packages")) {
+      if (t.includes("explore packages") || t.includes("view packages") || t.includes("load more packages")) {
         return { kind: "tab", tabId: "packages" };
       }
 
@@ -933,7 +1277,8 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
 
     cartPayBtn?.addEventListener("click", () => {
       closeOverlay("cartOverlay");
-      window.showProcessingModal();
+      setActiveTab("payment", false);
+      requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
     });
 
     // Ensure these popups are always outside tab panels/layout contexts.
@@ -975,6 +1320,7 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
 
     injectBookingButtons();
     wireHomeWidgetTabs();
+    wireHomePackagesCarousel();
 
     document.querySelector('nav[role="tablist"]')?.addEventListener("keydown", (event) => {
       if (!(event instanceof KeyboardEvent)) return;
@@ -1032,15 +1378,18 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
       }
 
       const inlineClick = clickable.getAttribute("onclick") || "";
+      let handledInlineOverlay = false;
       if (inlineClick.includes("drawerOverlay") || inlineClick.includes("packageDetailsDrawer")) {
         event.preventDefault();
         if (inlineClick.includes("classList.add")) {
           openById("drawerOverlay");
           openById("packageDetailsDrawer");
+          handledInlineOverlay = true;
         }
         if (inlineClick.includes("classList.remove")) {
           closeById("drawerOverlay");
           closeById("packageDetailsDrawer");
+          handledInlineOverlay = true;
         }
       }
 
@@ -1048,9 +1397,11 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
         event.preventDefault();
         if (inlineClick.includes("classList.add")) {
           openById("fareRulesModal");
+          handledInlineOverlay = true;
         }
         if (inlineClick.includes("classList.remove")) {
           closeById("fareRulesModal");
+          handledInlineOverlay = true;
         }
       }
 
@@ -1058,10 +1409,45 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
         event.preventDefault();
         if (inlineClick.includes("classList.add")) {
           openById("hotelDetailsModal");
+          handledInlineOverlay = true;
         }
         if (inlineClick.includes("classList.remove")) {
           closeById("hotelDetailsModal");
+          handledInlineOverlay = true;
         }
+      }
+
+      if (handledInlineOverlay) {
+        return;
+      }
+
+      const clickableText = (clickable.textContent || "").toLowerCase().trim();
+      if (clickable.closest("#packageDetailsDrawer") && (clickableText.includes("proceed to book") || clickableText === "book now")) {
+        event.preventDefault();
+        const drawer = document.getElementById("packageDetailsDrawer");
+        const titleEl = drawer?.querySelector("h2, h3, h4");
+        const textContent = drawer?.textContent || "";
+        const matchedPrice = textContent.match(/₹\s*[\d,]+/);
+        const title = (titleEl?.textContent || "Package Booking").trim();
+        const price = (matchedPrice?.[0] || "Rs 145000").trim();
+
+        cartItems.push({
+          title,
+          type: "package",
+          qty: 1,
+          total: Math.max(1, parseRupee(price)),
+        });
+        updateCartUI();
+
+        const previous = clickable.textContent;
+        clickable.textContent = "Added to Cart";
+        setTimeout(() => {
+          clickable.textContent = previous;
+        }, 900);
+
+        closeById("packageDetailsDrawer");
+        closeById("drawerOverlay");
+        return;
       }
 
       if (clickable.hasAttribute("data-open-booking")) {
@@ -1101,7 +1487,12 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
         }
 
         if (action.kind === "pay") {
-          window.showProcessingModal();
+          if (currentTab !== "payment") {
+            setActiveTab("payment", false);
+            requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
+          } else {
+            window.showProcessingModal();
+          }
           return;
         }
 
@@ -1145,7 +1536,10 @@ export async function GET() {
     const tabMarkup = Object.fromEntries(
       Object.entries(source).map(([tab, html]) => {
         const body = extractBody(html);
-        const content = stripHeaderAndScripts(body);
+        let content = stripHeaderAndScripts(body);
+        if (tab === "home") {
+          content = injectHomePackagesCarousel(content);
+        }
         return [tab, content];
       }),
     ) as Record<TabId, string>;
