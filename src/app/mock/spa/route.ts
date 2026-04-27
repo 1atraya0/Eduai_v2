@@ -18,7 +18,6 @@ type TabId = keyof typeof resourceFiles;
 
 const navItems: Array<{ id: TabId; label: string }> = [
   { id: "home", label: "Home" },
-  { id: "flights", label: "Flights" },
   { id: "packages", label: "Packages" },
   { id: "about", label: "About Us" },
   { id: "terms", label: "T&C" },
@@ -36,7 +35,14 @@ const homePackagesCarouselMarkup = `
     </div>
 
     <div class="home-packages-viewport">
-      <div id="homePackagesTrack" class="home-packages-track" aria-live="polite">
+      <div class="relative">
+        <button id="homePackagesPrev" aria-label="Previous package" type="button" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);z-index:10;background:rgba(255,255,255,0.5);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-radius:9999px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,0.08);border:1px solid rgba(255,255,255,0.6);">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <button id="homePackagesNext" aria-label="Next package" type="button" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);z-index:10;background:rgba(255,255,255,0.5);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-radius:9999px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,0.08);border:1px solid rgba(255,255,255,0.6);">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+        <div id="homePackagesTrack" class="home-packages-track" aria-live="polite">
         <article class="home-package-card" data-carousel-index="0">
           <img class="home-package-image" src="https://images.unsplash.com/photo-1598091383021-15ddea10925d?auto=format&fit=crop&w=900&q=80" alt="Snowy Kashmir valley" loading="lazy" />
           <div class="home-package-content">
@@ -118,7 +124,7 @@ const homePackagesCarouselMarkup = `
         </article>
 
         <article class="home-package-card" data-carousel-index="5">
-          <img class="home-package-image" src="https://images.unsplash.com/photo-1590845947670-c009801ffa74?auto=format&fit=crop&w=900&q=80" alt="Golden Temple in Amritsar" loading="lazy" />
+          <img class="home-package-image" src="https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&w=900&q=80" alt="Golden Temple in Amritsar, Punjab" loading="lazy" />
           <div class="home-package-content">
             <p class="text-xs font-semibold uppercase tracking-[0.18em] text-brand-700">2N / 3D</p>
             <h3 class="mt-2 text-xl font-bold text-gray-900">Punjab Heritage Trail</h3>
@@ -199,7 +205,7 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
     )
     .join("\n");
 
-  const tabPanels: TabId[] = ["home", "flights", "hotels", "packages", "payment", "dashboard", "about", "terms", "login"];
+  const tabPanels: TabId[] = ["home", "packages", "payment", "dashboard", "about", "terms", "login"];
 
   const sections = tabPanels
     .map(
@@ -699,10 +705,6 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
         </button>
       </div>
       <div id="cartItems" class="space-y-3"></div>
-      <div class="mt-5 flex items-center justify-between border-t border-gray-200 pt-4">
-        <p class="text-sm text-gray-500">Total</p>
-        <p id="cartTotal" class="text-xl font-bold text-brand-600">Rs 0</p>
-      </div>
       <button id="cartPayBtn" class="mt-4 w-full rounded-xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white hover:bg-brand-700">
         Pay All
       </button>
@@ -723,7 +725,7 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
       "signup": "login"
     };
 
-    const tabOrder = ["home", "flights", "hotels", "packages", "payment", "dashboard", "about", "terms", "login"];
+    const tabOrder = ["home", "packages", "payment", "dashboard", "about", "terms", "login"];
     let currentTab = "home";
     const cartItems = [];
     let lastScrollY = window.scrollY;
@@ -821,8 +823,7 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
       const cartButton = document.getElementById("cartButton");
       const cartCount = document.getElementById("cartCount");
       const cartItemsHost = document.getElementById("cartItems");
-      const cartTotal = document.getElementById("cartTotal");
-      if (!cartButton || !cartCount || !cartItemsHost || !cartTotal) return;
+      if (!cartButton || !cartCount || !cartItemsHost) return;
 
       if (cartItems.length > 0) {
         cartButton.classList.remove("hidden");
@@ -835,9 +836,7 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
       cartCount.textContent = String(cartItems.length);
       cartItemsHost.innerHTML = "";
 
-      let total = 0;
       cartItems.forEach((item, index) => {
-        total += item.total;
         const row = document.createElement("div");
         row.className = "rounded-xl border border-gray-200 p-3";
         row.innerHTML =
@@ -847,14 +846,11 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
               '<p class="text-xs text-gray-500">Qty ' + item.qty + ' • ' + item.type + '</p>' +
             '</div>' +
             '<div class="text-right">' +
-              '<p class="text-sm font-bold text-brand-600">' + formatRupee(item.total) + '</p>' +
               '<button data-remove-cart="' + index + '" class="mt-1 text-xs text-red-500 hover:text-red-600">Remove</button>' +
             '</div>' +
           '</div>';
         cartItemsHost.appendChild(row);
       });
-
-      cartTotal.textContent = formatRupee(total);
     }
 
     function openOverlay(id) {
@@ -986,9 +982,8 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
 
       const mapping = {
         flights: "flights",
-        hotels: "hotels",
         packages: "packages",
-        visa: "terms",
+        visa: "packages",
       };
 
       const activateLocal = (activeBtn) => {
@@ -1000,21 +995,40 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
         activeBtn.classList.add("text-brand-600", "font-semibold", "border-b-2", "border-brand-600");
       };
 
-      buttons.forEach((btn, index) => {
+        buttons.forEach((btn, index) => {
         btn.setAttribute("type", "button");
-        if (index === 0) {
-          activateLocal(btn);
-        }
-
-        btn.addEventListener("click", (event) => {
-          event.preventDefault();
-          activateLocal(btn);
-
+          // Hide hotels tab entirely if present
           const label = (btn.textContent || "").toLowerCase().trim();
-          const key = Object.keys(mapping).find((k) => label.includes(k));
-          if (!key) return;
-          setActiveTab(mapping[key]);
-        });
+          if (label.includes("hotel")) {
+            btn.style.display = "none";
+            return;
+          }
+
+          if (index === 0) {
+            activateLocal(btn);
+          }
+
+          btn.addEventListener("click", (event) => {
+            event.preventDefault();
+            activateLocal(btn);
+
+            const label = (btn.textContent || "").toLowerCase().trim();
+            const key = Object.keys(mapping).find((k) => label.includes(k));
+            if (!key) return;
+            const targetTab = mapping[key];
+            setActiveTab(targetTab);
+
+            // If user clicked Visa, navigate to packages and scroll to visa-free section
+            if (key === "visa") {
+              requestAnimationFrame(() => {
+                const packagesPanel = document.querySelector('[data-tab-panel="packages"]');
+                const visaSection = packagesPanel?.querySelector('#visa-free');
+                if (visaSection instanceof HTMLElement) {
+                  visaSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+              });
+            }
+          });
       });
     }
 
@@ -1070,6 +1084,12 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
       const scrollByCard = (direction) => {
         scrollToIndex(activeIndex + direction, "smooth");
       };
+
+      // Wire arrow buttons
+      const prevBtn = document.getElementById("homePackagesPrev");
+      const nextBtn = document.getElementById("homePackagesNext");
+      if (prevBtn) prevBtn.addEventListener("click", () => scrollByCard(-1));
+      if (nextBtn) nextBtn.addEventListener("click", () => scrollByCard(1));
 
       const updateActiveFromScroll = () => {
         const center = track.scrollLeft + track.clientWidth / 2;
@@ -1151,9 +1171,8 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
         return { kind: "pay" };
       }
 
-      if (t.includes("search flights") || t.includes("edit search")) {
-        return { kind: "tab", tabId: "flights" };
-      }
+      // Intentionally do not map "search flights" to the flights tab.
+      // Keep the Search Flights CTA static (user requested no redirect).
 
       if (t.includes("go to dashboard") || t.includes("customer dashboard")) {
         return { kind: "tab", tabId: "dashboard" };
@@ -1245,7 +1264,11 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
       }
     });
 
-    cartPayBtn?.addEventListener("click", () => {
+    cartPayBtn?.addEventListener("click", (event) => {
+      // Prevent the global click handler from also interpreting this as a 'pay' action
+      // which would cause immediate processing. We only want to navigate to payment.
+      event.stopPropagation();
+      event.preventDefault();
       closeOverlay("cartOverlay");
       setActiveTab("payment", false);
       requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
@@ -1509,6 +1532,10 @@ export async function GET() {
         let content = stripHeaderAndScripts(body);
         if (tab === "home") {
           content = injectHomePackagesCarousel(content);
+        }
+        // Inject a small visa-free anchor into packages panel so Visa tab can scroll to it
+        if (tab === "packages") {
+          content = '<section id="visa-free" class="my-6 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8"><h3 class="text-lg font-semibold text-brand-700">Visa Free Packages</h3><p class="text-sm text-gray-600 mt-1">Explore destinations that offer visa-free travel or visa-on-arrival.</p></section>' + content;
         }
         return [tab, content];
       }),
