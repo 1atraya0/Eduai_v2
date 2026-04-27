@@ -266,9 +266,14 @@ export function PackagesPanel({ onOpenPackageDrawer }: PackagesPanelProps) {
               <p className="text-sm text-[var(--ink-600)]">Flights + stay + sightseeing included.</p>
               <div className="mt-4 flex items-center justify-between">
                 <p className="text-lg font-bold">{price}</p>
-                <Button size="sm" onClick={onOpenPackageDrawer}>
-                  View
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button size="sm" onClick={onOpenPackageDrawer}>
+                    View
+                  </Button>
+                  <Button size="sm" onClick={onOpenPackageDrawer} variant="secondary">
+                    Add
+                  </Button>
+                </div>
               </div>
             </Card>
           ))}

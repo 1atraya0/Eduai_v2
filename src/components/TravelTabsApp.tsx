@@ -4,8 +4,6 @@ import { useMemo } from "react";
 
 type TabId =
   | "home"
-  | "flights"
-  | "hotels"
   | "packages"
   | "payment"
   | "dashboard"
@@ -15,8 +13,6 @@ type TabId =
 
 const tabs: Array<{ id: TabId; label: string }> = [
   { id: "home", label: "Home" },
-  { id: "flights", label: "Flights" },
-  { id: "hotels", label: "Hotels" },
   { id: "packages", label: "Packages" },
   { id: "payment", label: "Payment" },
   { id: "dashboard", label: "Dashboard" },
