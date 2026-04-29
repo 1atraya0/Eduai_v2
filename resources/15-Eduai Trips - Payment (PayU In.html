@@ -130,10 +130,7 @@
         <div class="max-w-[1440px] mx-auto px-6 h-20 flex items-center justify-between">
             <!-- Logo -->
             <a href="#" class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center text-white">
-                    <i class="fa-solid fa-plane"></i>
-                </div>
-                <span class="text-xl font-bold tracking-tight text-gray-900">EduaiTrips</span>
+                <img src="/logo.png" alt="EduaiTrips Logo" class="h-8 w-auto">
             </a>
 
             <!-- Desktop Navigation -->
@@ -360,26 +357,26 @@
                             
                             <div class="flex items-start gap-4 mb-4">
                                 <div class="w-12 h-12 bg-white rounded-lg flex items-center justify-center shadow-sm border border-gray-100 shrink-0">
-                                    <i class="fa-solid fa-plane-departure text-brand-500 text-xl"></i>
+                                    <i id="paymentSummaryIcon" class="fa-solid fa-suitcase-rolling text-brand-500 text-xl"></i>
                                 </div>
                                 <div>
-                                    <p class="text-sm font-bold text-gray-900">New Delhi (DEL) to Mumbai (BOM)</p>
-                                    <p class="text-xs text-gray-500">IndiGo • Economy • Direct</p>
+                                    <p id="paymentSummaryTitle" class="text-sm font-bold text-gray-900">Package Details</p>
+                                    <p id="paymentSummarySubtitle" class="text-xs text-gray-500">Cart checkout • 1 item</p>
                                 </div>
                             </div>
                             
-                            <div class="grid grid-cols-2 gap-4 text-sm">
+                            <div id="paymentSummaryMeta" class="grid grid-cols-2 gap-4 text-sm">
                                 <div>
-                                    <p class="text-xs text-gray-500 mb-1">Departure</p>
-                                    <p class="font-semibold text-gray-900">15 Oct, 08:30 AM</p>
+                                    <p class="text-xs text-gray-500 mb-1">Booking Type</p>
+                                    <p id="paymentSummaryType" class="font-semibold text-gray-900">Package</p>
                                 </div>
                                 <div>
-                                    <p class="text-xs text-gray-500 mb-1">Arrival</p>
-                                    <p class="font-semibold text-gray-900">15 Oct, 10:45 AM</p>
+                                    <p class="text-xs text-gray-500 mb-1">Items</p>
+                                    <p id="paymentSummaryItems" class="font-semibold text-gray-900">1</p>
                                 </div>
                                 <div class="col-span-2">
-                                    <p class="text-xs text-gray-500 mb-1">Travelers</p>
-                                    <p class="font-semibold text-gray-900">1 Adult</p>
+                                    <p class="text-xs text-gray-500 mb-1">Details</p>
+                                    <p id="paymentSummaryDetails" class="font-semibold text-gray-900">Your selected package will be charged at checkout.</p>
                                 </div>
                             </div>
                         </div>
@@ -387,22 +384,22 @@
                         <!-- Price Breakdown -->
                         <div class="p-6 space-y-4">
                             <div class="flex justify-between text-sm">
-                                <span class="text-gray-600">Base Fare (1 Adult)</span>
-                                <span class="font-medium text-gray-900">₹4,500</span>
+                                <span id="paymentSummaryBaseLabel" class="text-gray-600">Package Price</span>
+                                <span id="paymentSummaryBaseAmount" class="font-medium text-gray-900">₹0</span>
                             </div>
                             <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">Taxes & Fees</span>
-                                <span class="font-medium text-gray-900">₹850</span>
+                                <span id="paymentSummaryTaxes" class="font-medium text-gray-900">₹0</span>
                             </div>
                             <div class="flex justify-between text-sm">
                                 <span class="text-gray-600">Convenience Fee</span>
-                                <span class="font-medium text-gray-900">₹250</span>
+                                <span id="paymentSummaryConvenience" class="font-medium text-gray-900">₹0</span>
                             </div>
                             
                             <!-- Discount Line (if applicable) -->
-                            <div class="flex justify-between text-sm text-brand-600 font-medium">
-                                <span>Coupon Discount (FESTIVAL10)</span>
-                                <span>-₹450</span>
+                            <div id="paymentSummaryDiscountRow" class="flex justify-between text-sm text-brand-600 font-medium hidden">
+                                <span id="paymentSummaryDiscountLabel">Coupon Discount</span>
+                                <span id="paymentSummaryDiscount">-₹0</span>
                             </div>
 
                             <div class="border-t border-gray-200 pt-4 mt-4 flex justify-between items-end">
@@ -410,14 +407,14 @@
                                     <p class="text-lg font-bold text-gray-900">Total Amount</p>
                                     <p class="text-xs text-gray-500">Includes all taxes</p>
                                 </div>
-                                <p class="text-2xl font-bold text-brand-600">₹5,150</p>
+                                <p id="paymentSummaryTotal" class="text-2xl font-bold text-brand-600">₹0</p>
                             </div>
                         </div>
 
                         <!-- Pay Button -->
                         <div class="p-6 bg-gray-50 border-t border-gray-100">
-                            <button onclick="showProcessingModal()" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 px-6 rounded-xl transition-colors shadow-lg text-base flex items-center justify-center gap-2">
-                                Pay ₹5,150 <i class="fa-solid fa-lock text-sm"></i>
+                            <button id="payNowButton" onclick="showProcessingModal()" class="w-full bg-brand-600 hover:bg-brand-700 text-white font-bold py-3.5 px-6 rounded-xl transition-colors shadow-lg text-base flex items-center justify-center gap-2">
+                                Pay ₹0 <i class="fa-solid fa-lock text-sm"></i>
                             </button>
                             <p class="text-center text-xs text-gray-500 mt-3">By proceeding, you agree to our Terms & Conditions</p>
                         </div>
@@ -502,10 +499,7 @@
                 <!-- Brand -->
                 <div class="col-span-1 md:col-span-1">
                     <div class="flex items-center gap-2 mb-6">
-                        <div class="w-8 h-8 bg-brand-500 rounded-lg flex items-center justify-center text-white">
-                            <i class="fa-solid fa-plane"></i>
-                        </div>
-                        <span class="text-xl font-bold tracking-tight text-white">EduaiTrips</span>
+                        <img src="/logo.png" alt="EduaiTrips Logo" class="h-8 w-auto">
                     </div>
                     <p class="text-gray-400 text-sm mb-6 leading-relaxed">
                         Your trusted partner for seamless travel experiences. Book flights, hotels, packages, and manage visas all in one place.
@@ -556,15 +550,15 @@
                     <ul class="space-y-4 text-sm text-gray-400">
                         <li class="flex items-start gap-3">
                             <i class="fa-solid fa-location-dot mt-1 text-brand-500"></i>
-                            <span>123 Travel Hub Building, Connaught Place, New Delhi, India 110001</span>
+                            <span>F1601, Mapsko Mount Ville, sector 79, Gurgaon-122004</span>
                         </li>
                         <li class="flex items-center gap-3">
                             <i class="fa-solid fa-phone text-brand-500"></i>
-                            <span>+91 98765 43210</span>
+                            <span>7003030703</span>
                         </li>
                         <li class="flex items-center gap-3">
                             <i class="fa-solid fa-envelope text-brand-500"></i>
-                            <span>support@eduaitrips.com</span>
+                            <span>info@eudaitrip.com / info@eudaitrips.co.in</span>
                         </li>
                     </ul>
                 </div>

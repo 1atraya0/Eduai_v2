@@ -18,6 +18,7 @@ type TabId = keyof typeof resourceFiles;
 
 const navItems: Array<{ id: TabId; label: string }> = [
   { id: "home", label: "Home" },
+  { id: "flights", label: "Flights" },
   { id: "packages", label: "Packages" },
   { id: "about", label: "About Us" },
   { id: "terms", label: "T&C" },
@@ -205,7 +206,7 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
     )
     .join("\n");
 
-  const tabPanels: TabId[] = ["home", "packages", "payment", "dashboard", "about", "terms", "login"];
+  const tabPanels: TabId[] = ["home", "flights", "packages", "payment", "dashboard", "about", "terms", "login"];
 
   const sections = tabPanels
     .map(
@@ -656,10 +657,7 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
   <header id="header" class="bg-white border-b border-gray-100 sticky top-0 z-50">
     <div class="spa-top max-w-360 mx-auto px-6 h-20 flex items-center justify-between gap-3">
       <button data-tab-target="home" class="flex items-center gap-2">
-        <div class="w-8 h-8 bg-brand-600 rounded-lg flex items-center justify-center text-white">
-          <i class="fa-solid fa-plane"></i>
-        </div>
-        <span class="spa-brand-text text-xl font-bold tracking-tight text-gray-900">EduaiTrips</span>
+        <img src="/logo.png" alt="EduaiTrips Logo" class="h-8 w-auto">
       </button>
       <nav role="tablist" aria-label="Travel sections" class="flex items-center gap-7 h-full relative">
         ${nav}
@@ -725,7 +723,7 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
       "signup": "login"
     };
 
-    const tabOrder = ["home", "packages", "payment", "dashboard", "about", "terms", "login"];
+    const tabOrder = ["home", "flights", "packages", "payment", "dashboard", "about", "terms", "login"];
     let currentTab = "home";
     const cartItems = [];
     let lastScrollY = window.scrollY;
@@ -764,6 +762,11 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
       updateTabA11y(tabId);
       currentTab = tabId;
       updateBookingBarVisibility(true);
+      if (tabId === "payment") {
+        syncPaymentSummary();
+      }
+      // Intentionally do not auto-run flight searches when switching tabs.
+      // Users should trigger searches via the flights form submit to avoid unexpected API calls.
       if (keepScrollPosition) {
         requestAnimationFrame(() => window.scrollTo({ top: currentScrollY, behavior: "auto" }));
       }
@@ -819,6 +822,251 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
       return "Rs " + value.toLocaleString("en-IN");
     }
 
+    function extractMoneyLabel(text) {
+      const matches = String(text || "").match(/(?:₹|Rs)\s*[\d,]+(?:\.\d+)?/gi);
+      if (!matches || matches.length === 0) return "";
+      return matches[matches.length - 1].replace(/\s+/g, " ").trim();
+    }
+
+    function getCartTotals() {
+      return cartItems.reduce(
+        (acc, item) => {
+          const qty = Number(item.qty || 1);
+          const total = Number(item.total || 0) * qty;
+          acc.count += qty;
+          acc.total += total;
+          return acc;
+        },
+        { count: 0, total: 0 },
+      );
+    }
+
+    function syncPaymentSummary() {
+      const summaryTitle = document.getElementById("paymentSummaryTitle");
+      const summarySubtitle = document.getElementById("paymentSummarySubtitle");
+      const summaryType = document.getElementById("paymentSummaryType");
+      const summaryItems = document.getElementById("paymentSummaryItems");
+      const summaryDetails = document.getElementById("paymentSummaryDetails");
+      const summaryBaseLabel = document.getElementById("paymentSummaryBaseLabel");
+      const summaryBaseAmount = document.getElementById("paymentSummaryBaseAmount");
+      const summaryTaxes = document.getElementById("paymentSummaryTaxes");
+      const summaryConvenience = document.getElementById("paymentSummaryConvenience");
+      const summaryDiscountRow = document.getElementById("paymentSummaryDiscountRow");
+      const summaryDiscount = document.getElementById("paymentSummaryDiscount");
+      const summaryTotal = document.getElementById("paymentSummaryTotal");
+      const payNowButton = document.getElementById("payNowButton");
+
+      const totals = getCartTotals();
+      const primaryItem = cartItems[cartItems.length - 1] || cartItems[0] || null;
+      const bookingType = primaryItem?.type || (totals.count > 1 ? "cart" : "package");
+      const bookingTitle = primaryItem?.title || (totals.count > 1 ? "Cart Checkout" : "Package Details");
+      const bookingQuantity = primaryItem?.qty || totals.count || 1;
+      const bookingTotal = totals.total || Number(primaryItem?.total || 0) || 0;
+      const bookingLabel = primaryItem?.totalLabel || formatRupee(bookingTotal);
+
+      if (summaryTitle) summaryTitle.textContent = bookingTitle;
+      if (summarySubtitle) summarySubtitle.textContent = (bookingType === "package" ? "Package" : bookingType) + " • " + bookingQuantity + " item" + (bookingQuantity === 1 ? "" : "s");
+      if (summaryType) summaryType.textContent = bookingType.charAt(0).toUpperCase() + bookingType.slice(1);
+      if (summaryItems) summaryItems.textContent = String(bookingQuantity);
+      if (summaryDetails) {
+        summaryDetails.textContent = bookingType === "package"
+          ? "Package checkout from your cart."
+          : "Your selected booking will be charged at checkout.";
+      }
+      if (summaryBaseLabel) summaryBaseLabel.textContent = bookingType === "package" ? "Package Price" : "Base Fare";
+      if (summaryBaseAmount) summaryBaseAmount.textContent = bookingLabel;
+      if (summaryTaxes) summaryTaxes.textContent = formatRupee(0);
+      if (summaryConvenience) summaryConvenience.textContent = formatRupee(0);
+      if (summaryDiscountRow) summaryDiscountRow.classList.add("hidden");
+      if (summaryDiscount) summaryDiscount.textContent = "-" + formatRupee(0);
+      if (summaryTotal) summaryTotal.textContent = bookingLabel;
+      if (payNowButton) payNowButton.innerHTML = "Pay " + bookingLabel + ' <i class="fa-solid fa-lock text-sm"></i>';
+    }
+
+    function readFlightSearchForm() {
+      const departure = document.getElementById("flightDepartureId");
+      const arrival = document.getElementById("flightArrivalId");
+      const outbound = document.getElementById("flightOutboundDate");
+      const currency = document.getElementById("flightCurrency");
+
+      return {
+        departure_id: departure instanceof HTMLInputElement ? departure.value.trim().toUpperCase() || "DEL" : "DEL",
+        arrival_id: arrival instanceof HTMLInputElement ? arrival.value.trim().toUpperCase() || "BOM" : "BOM",
+        outbound_date: outbound instanceof HTMLInputElement ? outbound.value.trim() || "2026-04-30" : "2026-04-30",
+        currency: currency instanceof HTMLInputElement ? currency.value.trim().toUpperCase() || "INR" : "INR",
+      };
+    }
+
+    async function loadFlightResults() {
+      const flightResultsList = document.getElementById("flightResultsList");
+      const flightResultsCount = document.getElementById("flightResultsCount");
+      if (!(flightResultsList instanceof HTMLElement)) return;
+
+      const params = readFlightSearchForm();
+      const query = new URLSearchParams({
+        departure_id: params.departure_id,
+        arrival_id: params.arrival_id,
+        outbound_date: params.outbound_date,
+        currency: params.currency,
+      });
+
+      flightResultsList.innerHTML = '<div class="rounded-2xl border border-dashed border-gray-200 bg-white p-6 text-sm text-gray-500">Loading live flight results...</div>';
+      if (flightResultsCount instanceof HTMLElement) {
+        flightResultsCount.textContent = "Searching flights...";
+      }
+
+      try {
+        const response = await fetch("/api/flights/search?" + query.toString(), { cache: "no-store" });
+        const payload = await response.json();
+
+        if (!response.ok) {
+          throw new Error(payload.error || "Unable to load flights");
+        }
+
+        flightResultsList.innerHTML = payload.html || '<div class="rounded-2xl border border-dashed border-gray-200 bg-white p-6 text-sm text-gray-500">No flights were returned for this search.</div>';
+        if (flightResultsCount instanceof HTMLElement) {
+          flightResultsCount.textContent = payload.countLabel || ((payload.count || 0) + " flights available");
+        }
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Unable to load flights";
+        flightResultsList.innerHTML = '<div class="rounded-2xl border border-dashed border-red-200 bg-red-50 p-6 text-sm text-red-700">' + message + '. Add your SerpApi key in SERPAPI_API_KEY and try again.</div>';
+        if (flightResultsCount instanceof HTMLElement) {
+          flightResultsCount.textContent = "Search unavailable";
+        }
+      }
+    }
+
+    function wireFlightSearchForm() {
+      const form = document.getElementById("flightSearchForm");
+      if (!(form instanceof HTMLFormElement)) return;
+
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        loadFlightResults();
+      });
+    }
+
+    // Helper: extract airport code when user types like "New Delhi (DEL)" or "DEL"
+    function extractAirportCode(text) {
+      if (!text) return "";
+      const m = String(text).toUpperCase().match(/\(([A-Z]{3})\)/);
+      if (m && m[1]) return m[1];
+      const token = String(text).trim().toUpperCase().match(/^[A-Z]{3}$/);
+      return token ? token[0] : "";
+    }
+
+    // Small static airport list for autocomplete (keeps UI local & fast). Extend as needed.
+    const airportList = [
+      { code: 'DEL', name: 'Indira Gandhi International Airport', city: 'New Delhi' },
+      { code: 'BOM', name: 'Chhatrapati Shivaji Maharaj Int Airport', city: 'Mumbai' },
+      { code: 'BLR', name: 'Kempegowda International Airport', city: 'Bengaluru' },
+      { code: 'MAA', name: 'Chennai International Airport', city: 'Chennai' },
+      { code: 'HYD', name: 'Rajiv Gandhi International Airport', city: 'Hyderabad' },
+      { code: 'CCU', name: 'Netaji Subhas Chandra Bose Intl', city: 'Kolkata' },
+      { code: 'AMD', name: 'Sardar Vallabhbhai Patel Intl', city: 'Ahmedabad' },
+      { code: 'COK', name: 'Cochin International Airport', city: 'Kochi' },
+      { code: 'GOI', name: 'Dabolim Airport', city: 'Goa' },
+      { code: 'IXC', name: 'Chandigarh International Airport', city: 'Chandigarh' },
+    ];
+
+    function getAirportMatches(term) {
+      const normalized = String(term || '').trim().toLowerCase();
+      if (!normalized) {
+        return airportList.slice(0, 8);
+      }
+
+      const matches = airportList.filter((airport) => {
+        const code = airport.code.toLowerCase();
+        const city = airport.city.toLowerCase();
+        const name = airport.name.toLowerCase();
+        return code.startsWith(normalized) || code.includes(normalized) || city.includes(normalized) || name.includes(normalized);
+      });
+
+      if (/^[a-z]{1,2}$/.test(normalized)) {
+        return airportList.filter((airport) => airport.code.toLowerCase().startsWith(normalized));
+      }
+
+      return matches.slice(0, 6);
+    }
+
+    function attachAirportAutocomplete(input) {
+      if (!(input instanceof HTMLInputElement)) return;
+
+        // Do not re-parent the input (preserve layout & listeners).
+        const parent = input.parentElement || document.body;
+        if (getComputedStyle(parent).position === 'static') {
+          parent.style.position = 'relative';
+        }
+
+        const dropdown = document.createElement('div');
+        dropdown.style.position = 'absolute';
+        dropdown.style.left = '0';
+        dropdown.style.right = '0';
+        dropdown.style.top = 'calc(100% + 6px)';
+        dropdown.style.zIndex = '9999';
+        dropdown.className = 'rounded-xl border border-gray-200 bg-white shadow-md overflow-hidden';
+        dropdown.style.display = 'none';
+        dropdown.setAttribute('role', 'listbox');
+        parent.appendChild(dropdown);
+
+      let debounced;
+      function showResults(q) {
+        const results = getAirportMatches(q);
+        if (results.length === 0) {
+          dropdown.innerHTML = '<div class="p-3 text-sm text-gray-500">No matches</div>';
+          dropdown.style.display = '';
+          return;
+        }
+        dropdown.innerHTML = results.map(function(r){
+          return '<button type="button" data-code="' + r.code + '" data-city="' + (r.city || '') + '" data-name="' + (r.name || '') + '" class="w-full text-left p-3 text-sm hover:bg-gray-50">' +
+            '<div class="font-semibold">' + r.code + ' <span class="font-normal text-gray-500">' + r.city + '</span></div>' +
+            '<div class="text-xs text-gray-500">' + r.name + '</div>' +
+          '</button>';
+        }).join('');
+        dropdown.style.display = '';
+      }
+
+      input.addEventListener('input', (e) => {
+        window.clearTimeout(debounced);
+        debounced = window.setTimeout(() => showResults(input.value), 160);
+      });
+
+      input.addEventListener('focus', () => showResults(input.value));
+      input.addEventListener('blur', () => setTimeout(() => (dropdown.style.display = 'none'), 200));
+
+      // Capture selection on pointerdown so it occurs before input blur
+      dropdown.addEventListener('pointerdown', (ev) => {
+        const btn = (ev.target instanceof HTMLElement) ? ev.target.closest('button[data-code]') : null;
+        if (!btn) return;
+        const code = btn.getAttribute('data-code');
+        if (code && input instanceof HTMLInputElement) {
+          input.value = code;
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        // prevent default so blur handlers don't hide UI prematurely
+        ev.preventDefault();
+        dropdown.style.display = 'none';
+      });
+    }
+
+    function wireAirportAutocomplete() {
+      const selectors = [
+        '#hero input[type="text"]',
+        '#flightDepartureId',
+        '#flightArrivalId',
+      ];
+
+      const seen = new Set();
+      selectors.forEach((selector) => {
+        document.querySelectorAll(selector).forEach((input) => {
+          if (!(input instanceof HTMLInputElement)) return;
+          if (seen.has(input)) return;
+          seen.add(input);
+          attachAirportAutocomplete(input);
+        });
+      });
+    }
+
     function updateCartUI() {
       const cartButton = document.getElementById("cartButton");
       const cartCount = document.getElementById("cartCount");
@@ -853,6 +1101,8 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
       });
     }
 
+
+      syncPaymentSummary();
     function openOverlay(id) {
       pinOverlayToBody(id);
       const el = document.getElementById(id);
@@ -1232,6 +1482,8 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
     updateTabA11y("home");
     updateCartUI();
     updateBookingBarVisibility(true);
+    wireFlightSearchForm();
+    wireAirportAutocomplete();
 
     const cartButton = document.getElementById("cartButton");
     const closeCartOverlay = document.getElementById("closeCartOverlay");
@@ -1270,6 +1522,7 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
       event.stopPropagation();
       event.preventDefault();
       closeOverlay("cartOverlay");
+      syncPaymentSummary();
       setActiveTab("payment", false);
       requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
     });
@@ -1314,6 +1567,7 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
     injectBookingButtons();
     wireHomeWidgetTabs();
     wireHomePackagesCarousel();
+    syncPaymentSummary();
 
     document.querySelector('nav[role="tablist"]')?.addEventListener("keydown", (event) => {
       if (!(event instanceof KeyboardEvent)) return;
@@ -1348,6 +1602,43 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
         event.preventDefault();
         const tabId = explicit.getAttribute("data-tab-target");
         if (tabId) {
+          // If user clicked a flights CTA inside the home panel, copy home widget inputs
+          if (tabId === 'flights') {
+            const homePanel = document.querySelector('[data-tab-panel="home"]');
+            if (homePanel instanceof HTMLElement) {
+              const heroInputs = homePanel.querySelectorAll('#hero input[type="text"]');
+              const from = heroInputs[0] instanceof HTMLInputElement ? heroInputs[0].value : undefined;
+              const to = heroInputs[1] instanceof HTMLInputElement ? heroInputs[1].value : undefined;
+              const destFrom = document.getElementById('flightDepartureId');
+              const destTo = document.getElementById('flightArrivalId');
+
+              const findAndFormat = (raw) => {
+                const code = extractAirportCode(raw || '');
+                if (code) {
+                  const a = airportList.find(x => x.code === code);
+                  return a ? (a.city + ' (' + a.code + ')') : code;
+                }
+                // If there's no code, try to parse trailing parentheses
+                const parts = String(raw || '').split('(');
+                if (parts.length > 1) {
+                  const c = (parts[1] || '').replace(')', '').trim();
+                  if (/^[A-Z]{3}$/i.test(c)) {
+                    const a2 = airportList.find(x => x.code === c.toUpperCase());
+                    return a2 ? (a2.city + ' (' + a2.code + ')') : c.toUpperCase();
+                  }
+                }
+                return String(raw || '');
+              };
+
+              if (destFrom instanceof HTMLInputElement && typeof from !== 'undefined') {
+                destFrom.value = findAndFormat(from);
+              }
+              if (destTo instanceof HTMLInputElement && typeof to !== 'undefined') {
+                destTo.value = findAndFormat(to);
+              }
+            }
+          }
+
           setActiveTab(tabId);
           mobileMenu?.classList.remove("active");
         }
@@ -1419,16 +1710,18 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
         event.preventDefault();
         const drawer = document.getElementById("packageDetailsDrawer");
         const titleEl = drawer?.querySelector("h2, h3, h4");
+        const priceEl = drawer?.querySelector(".text-2xl.font-bold.text-brand-600, .text-2xl.font-bold, .text-brand-600.text-2xl");
         const textContent = drawer?.textContent || "";
-        const matchedPrice = textContent.match(/₹\s*[\d,]+/);
+        const matchedPrice = extractMoneyLabel(priceEl?.textContent || textContent);
         const title = (titleEl?.textContent || "Package Booking").trim();
-        const price = (matchedPrice?.[0] || "Rs 145000").trim();
+        const price = matchedPrice || "Rs 145000";
 
         cartItems.push({
           title,
           type: "package",
           qty: 1,
           total: Math.max(1, parseRupee(price)),
+          totalLabel: price,
         });
         updateCartUI();
 
@@ -1446,16 +1739,38 @@ function buildSpaHtml(tabMarkup: Record<TabId, string>, styles: string, links: s
       if (clickable.hasAttribute("data-open-booking")) {
         event.preventDefault();
         const type = clickable.getAttribute("data-booking-type") || currentTab;
-        const card = clickable.closest(".bg-white, .card-shadow") || clickable.parentElement;
-        const titleEl = card?.querySelector("h3, h4");
-        const priceEl = card?.querySelector(".text-brand-600, .text-2xl, .text-xl");
+
+        // Try multiple sensible ancestors/selectors to locate the card and price text.
+        let card = clickable.closest(".bg-white, .card-shadow, .home-package-card, article, .home-package-content") || clickable.parentElement;
+        if (!card) card = clickable.parentElement;
+
+        let titleEl = card?.querySelector("h3, h4") || card?.querySelector(".home-package-content h3, .home-package-content h4");
+        let priceEl = card?.querySelector(".text-brand-600.text-lg.font-bold, .text-brand-600, .text-2xl, .text-xl, .home-package-content .text-brand-600");
+
+        // If still not found, walk up a few ancestors to locate a nearby price element.
+        let priceText = priceEl?.textContent;
+        if (!priceText) {
+          let ancestor = clickable;
+          for (let i = 0; i < 4; i++) {
+            ancestor = ancestor.parentElement;
+            if (!ancestor) break;
+            const p = ancestor.querySelector(".text-brand-600.text-lg.font-bold, .text-brand-600, .text-2xl, .text-xl");
+            if (p && p.textContent && /(?:₹|Rs|\d)/.test(p.textContent)) {
+              priceText = p.textContent;
+              break;
+            }
+          }
+        }
+
         const title = (titleEl?.textContent || (type + " booking")).trim();
-        const price = (priceEl?.textContent || "Rs 5,150").trim();
+        const price = extractMoneyLabel(priceText || card?.textContent || "") || "Rs 5,150";
+
         cartItems.push({
           title,
           type,
           qty: 1,
           total: Math.max(1, parseRupee(price)),
+          totalLabel: price,
         });
         updateCartUI();
 
